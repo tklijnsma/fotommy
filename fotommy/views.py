@@ -59,6 +59,9 @@ def createpost():
             logging.info('postform.text.data = {0}'.format(postform.text.data))
             logging.info('postform.secretpassword.data = {0}'.format(postform.secretpassword.data))
 
+            if not os.path.exists('fotommy/pw.txt'):
+                logging.error('No file pw.txt found')
+                flash('Error processing password')
             with open('fotommy/pw.txt', 'r') as fp:
                 pw = fp.read()
             if postform.secretpassword.data != pw:
