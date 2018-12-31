@@ -59,7 +59,9 @@ def createpost():
             logging.info('postform.text.data = {0}'.format(postform.text.data))
             logging.info('postform.secretpassword.data = {0}'.format(postform.secretpassword.data))
 
-            if postform.secretpassword.data != 'amelie':
+            with open('fotommy/pw.txt', 'r') as fp:
+                pw = fp.read()
+            if postform.secretpassword.data != pw:
                 flash('Password is incorrect!')
             else:                
                 photos = request.files.getlist('postform-photos')
