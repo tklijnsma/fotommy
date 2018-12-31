@@ -1,0 +1,19 @@
+<div
+    style="display: inline-block; text-align: right; margin-bottom: 1em;">
+    <form method="post" id="{{form._prefix}}form">
+        {{ form.hidden_tag() }}
+        <div id="{{form._prefix}}submit" class="fotommy-nicebutton">
+            <i class="fas fa-heart"></i> <i class="fas fa-heart"></i> <i class="fas fa-heart"></i>
+            </div>
+        <b id="{{form._prefix}}n_likes">{{ n_likes }}</b>
+            {% if n_likes == 1 %}
+            person thinks
+            {% else %}
+            people think
+            {% endif %}
+            this is a nice {{objstr}}
+        <input type="hidden" name="prefix" value="{{form._prefix}}" />
+    </form>
+</div>
+
+

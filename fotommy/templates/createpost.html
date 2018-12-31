@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ dropzone.load_css() }}
+{{ dropzone.style('width: 96%; border:2px solid #385a97; margin: 0px 2%; min-height: 100px;') }}
+{% endblock %}
+
+{% block body %}
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='createpost.css') }}">
+
+
+Type your message and upload your photos here
+
+<br><br>
+
+<form method="post" enctype="multipart/form-data">
+
+    {{ postform.hidden_tag() }}
+
+    {% for message in postform.secretpassword.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    <p>
+        {{ postform.secretpassword(size=32, placeholder="Secret upload password", class_="cp-textfield") }}
+        </p>
+
+    {% for message in postform.text.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    <p>
+        {{ postform.text(size=32, placeholder="Your message", class_="cp-textfield") }}
+        </p>
+
+    {% for message in postform.photos.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    {{ postform.photos(class_="dropzone", multiple="") }}
+
+
+    <p style="margin-top: 1.0em;">
+        {{ postform.submit(class_="fotommy-postbutton") }}
+        </p>
+
+</form>
+
+{% endblock %}
+
+{% block scriptinputs %}
+{{ dropzone.load_js() }}
+{{ dropzone.config() }}
+{% endblock %}
+
+

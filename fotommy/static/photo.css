@@ -1,0 +1,32 @@
+
+.ph-fullbutton{
+    padding: 4px 18px;
+    margin: 16px 4px;
+    font-size: 0.8em;
+    }
+
+.ph-commentandformblock {
+    padding: 0.35em;
+    margin-top: -0.2em;
+    }
+
+
+.ph-nicebuttoncontainer {
+    display: inline-block; 
+    text-align: right;
+    margin-bottom: 1em;
+    }
+
+.ph-nicebutton{
+    padding: 4px 18px;
+    margin: 4px 2px;
+    font-size: 1.0em;
+    }
+
+
+.ph-photo {
+    /*height: 100vw;*/
+    width: 100%;
+    /*height: auto;*/
+    }
+

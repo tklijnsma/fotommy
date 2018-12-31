@@ -1,0 +1,29 @@
+<!doctype html>
+<title>fotommy</title>
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='base.css') }}">
+
+{% block head %}{% endblock %}
+
+<div class=page>
+
+    <div class="bg-lightgrey fotommy-header">
+        {% block backbutton %}{% endblock %}
+        <h1 class="text-darkgrey" style="display:inline; vertical-align: middle">Fotommy</h1>
+    </div>
+
+    {% for message in get_flashed_messages() %}
+        <div class=flash>{{ message }}</div>
+    {% endfor %}
+
+    {% block body %}{% endblock %}
+
+</div>
+
+{% block scriptinputs %}{% endblock %}
+
+<script>
+{% block script %}{% endblock %}
+</script>

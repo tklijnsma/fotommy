@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block body %}
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='timeline.css') }}">
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='post_block.css') }}">
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='photos_block.css') }}">
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='commentsection.css') }}">
+
+
+{% for post in posts %}
+    {% with post=post %}
+    {% include 'post_block.html' %}
+    {% endwith %}
+    <div class="tl-post-divider w100 bg-lightgrey"></div>
+{% else %}
+    <em>No posts found.</em>
+{% endfor %}
+{% endblock %}
+
+
+{% block scriptinputs %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/like.js') }}">
+</script>
+{% endblock %}
+
+{% block script %}
+{% for post in posts %}
+document.getElementById("{{post.likeform._prefix}}submit").addEventListener(
+    "click",
+    function(){submitFunction("{{post.likeform._prefix}}")}
+    );
+{% endfor %}
+{% endblock %}
+

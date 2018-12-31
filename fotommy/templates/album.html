@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block backbutton %}
+{% with back_url=url_for('albums') %}
+{% include 'backbutton.html' %}
+{% endwith %}
+{% endblock %}
+
+{% block body %}
+
+<h2>{{ album.name }}</h2>
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='photos_block.css') }}">
+
+{% with photos=album.photos, album_name=album.name %}
+{% include 'photos_block.html' %}
+{% endwith %}
+
+{% endblock %}

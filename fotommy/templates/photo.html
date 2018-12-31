@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block backbutton %}
+{% if photo.album.name == 'uploads' %}
+    {% with back_url=url_for('timeline') %}
+    {% include 'backbutton.html' %}
+    {% endwith %}
+{% else %}
+    {% with back_url=url_for('album', album_name=photo.album.name) %}
+    {% include 'backbutton.html' %}
+    {% endwith %}
+{% endif %}
+{% endblock %}
+
+{% block body %}
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='photo.css') }}">
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='commentsection.css') }}">
+
+<h2>{{ photo.album.name }}/{{ photo.id }}</h2>
+
+<!-- Photo header -->
+<div style="text-align: left">
+    <i style="color: #53585F">Taken on {{ photo.creation_date.strftime('%B %d, %Y at %H:%M') }}</i>
+    <div style="float: right; padding-bottom: 0.4em">
+        <a
+            class="fotommy-postbutton"
+            href="{{ url_for('fullres', album_name=photo.album.name, photo_id=photo.id) }}"
+            >
+            <i class="fas fa-arrows-alt"></i> Full
+        </a>
+    </div>
+</div>
+
+
+<img class="ph-photo" src="{{ url_for('static', filename=photo.imgrelpath_medium()) }}" alt="not_loaded" >
+
+
+{% with n_likes=photo.n_likes, form=likeform, objstr="photo" %}
+{% include 'likeblock.html' %}
+{% endwith %}
+
+<br>
+
+{% with comments=photo.comments, form=form %}
+{% include 'commentsection.html' %}
+{% endwith %}
+
+
+{% endblock %}
+
+
+
+
+
+{% block scriptinputs %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/like.js') }}">
+</script>
+{% endblock %}
+
+{% block script %}
+document.getElementById("{{likeform._prefix}}submit").addEventListener(
+    "click",
+    function(){submitFunction("{{likeform._prefix}}")}
+    );
+{% endblock %}
+

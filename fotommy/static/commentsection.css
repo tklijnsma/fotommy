@@ -1,0 +1,16 @@
+.commsec-commentform-authorfield, .commsec-commentform-messagefield {
+    border: 2px solid #DDDEE0;
+    border-radius: 4px;
+    width: 98%;
+    font-size: 1em;
+    }
+
+.commsec-commentform-messagefield {
+    height: 5em;
+    }
+
+.commsec-commentform-postbutton{
+    padding: 4px 25px;
+    margin: 4px 2px;
+    font-size: 1.5em;
+    }

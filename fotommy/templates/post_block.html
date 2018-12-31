@@ -1,0 +1,23 @@
+<div class="po-post-container w100">
+
+<div class="po-date text-darkgrey">{{ post.date }}</div>
+
+{{ post.text }}
+
+<br>
+
+{% with photos=post.photos, album_name="uploads" %}
+{% include 'photos_block.html' %}
+{% endwith %}
+
+{% with n_likes=post.n_likes, form=post.likeform, objstr="post" %}
+{% include 'likeblock.html' %}
+{% endwith %}
+
+<br>
+
+{% with comments=post.comments, form=post.commentform %}
+{% include 'commentsection.html' %}
+{% endwith %}
+
+</div>

@@ -1,0 +1,32 @@
+{% for comment in comments %}
+    <div class="bg-verylightgrey" style="-moz-border-radius:10px;
+    -webkit-border-radius:10px; margin:6px 0px;">
+    <b style="color: #385a97">{{ comment.author }}</b> {{ comment.text }}
+    </div>
+{% endfor %}
+
+<div style="font-size:14px; padding-top: 0.8em; padding-bottom: 0.1em; color: #385a97;"><i>Leave a comment!</i></div>
+
+<form method="post">
+    {{ form.hidden_tag() }}
+
+    {% for message in form.author.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+    <p>
+        {{ form.author(size=32, class_="commsec-commentform-authorfield", placeholder="Your name") }}
+        </p>
+
+    {% for message in form.text.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+    <p style="margin-top: -0.7em;">
+        {{ form.text(size=32, class_="commsec-commentform-messagefield", placeholder="Your message") }}
+        </p>
+
+    <p style="margin-top: -1.0em;">
+        <button type="submit" class="fotommy-postbutton">
+            <i class="far fa-comment"></i> Submit
+            </button>
+        </p>
+</form>

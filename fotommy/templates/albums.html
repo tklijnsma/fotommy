@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block body %}
+
+{% for album in albums %}
+    <a href="{{ url_for('album', album_name=album.name) }}" class="pagewidebutton">
+        {{album.name}} <span style="font-size: 10pt">({{album.n_photos_str()}})</span>
+    </a >
+{% else %}
+<em>No albums found.</em>
+{% endfor %}
+
+{% endblock %}

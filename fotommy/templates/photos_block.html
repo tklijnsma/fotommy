@@ -1,0 +1,20 @@
+<section class="pb-photos-section">
+{% for photo in photos[::-1] %}
+<div class="pb-photo-container">
+    <a href="{{ url_for('photo', album_name=album_name, photo_id=photo.id) }}">
+        <img
+            src="{{ url_for('static', filename=photo.imgrelpath_thumbnail()) }}"
+            alt="not_loaded"
+            >
+        <div class="bottom-left text-white">
+            {{ photo.n_comments() }}
+            <i class="far fa-comment"></i>
+            {{ photo.n_likes }}
+            <i class="fas fa-heart"></i>
+            </div>
+    </a>
+</div>
+{% else %}
+    <em>No images in album.</em>
+{% endfor %}
+</section>

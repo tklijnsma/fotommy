@@ -1,0 +1,1 @@
+from .fotommy import app
