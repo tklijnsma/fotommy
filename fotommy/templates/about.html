@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block backbutton %}
+    {% with back_url=url_for('timeline') %}
+    {% include 'backbutton.html' %}
+    {% endwith %}
+{% endblock %}
+
+{% block body %}
+
+<p><i>English version below</i></p>
+
+<p>
+    <h2>Waarom deze website</h2>
+
+    Omdat Thomas programmeren leuk vindt!
+
+</p>
+<p>
+
+<h2>Why this website</h2>
+
+Because Thomas likes programming!
+
+</p>
+
+
+{% endblock %}

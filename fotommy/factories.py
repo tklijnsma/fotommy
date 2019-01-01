@@ -144,7 +144,7 @@ class PhotoFactory(Factory):
             date_str = Image.open(imgpath_full)._getexif()[36867]
             datetime_object = datetime.strptime(date_str, '%Y:%m:%d %H:%M:%S')
             return datetime_object
-        except KeyError:
+        except:
             return None
 
 

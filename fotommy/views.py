@@ -31,7 +31,10 @@ def timeline():
                 post.n_likes += 1
                 db.session.commit()
                 logging.info('Increased like count for {0}'.format(post))
-                return '', 204
+                if 'safari' in request.headers.get('User-Agent').lower():
+                    return redirect(url_for('timeline'))
+                else:
+                    return '', 304
             elif (post.commentform.author.data or post.commentform.text.data) and post.commentform.validate_on_submit():
                 logging.info('Comment is submitted for Post {0}'.format(post))
                 logging.info('post.commentform.author.data = {0}'.format(post.commentform.author.data))
@@ -46,6 +49,10 @@ def timeline():
                 return redirect(url_for('timeline'))
     return render_template('timeline.html', posts=posts)
 
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 @app.route('/createpost', methods=['GET', 'POST'])
 def createpost():
@@ -63,8 +70,9 @@ def createpost():
                 logging.error('No file pw.txt found')
                 flash('Error processing password')
             with open('fotommy/pw.txt', 'r') as fp:
-                pw = fp.read()
+                pw = fp.read().strip()
             if postform.secretpassword.data != pw:
+                logging.error('{0} != {1} (actual pw)'.format(postform.secretpassword.data, pw))
                 flash('Password is incorrect!')
             else:                
                 photos = request.files.getlist('postform-photos')
@@ -73,7 +81,7 @@ def createpost():
                 if photos:
                     uploadalbum = dbmanager.album_by_name('uploads', fail_if_not_existing=False)
                     if uploadalbum is None:
-                        uploadalbum = factories.AlbumFactory.create('uploads')
+                        uploadalbum = factories.AlbumFactory().create('uploads')
                     photofactory = factories.PhotoFactory(uploadalbum)
 
                     for fs in photos:

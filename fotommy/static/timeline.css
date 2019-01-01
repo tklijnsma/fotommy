@@ -1,6 +1,14 @@
 
 .tl-post-divider {
-    height: 15px;
-    margin-top: 8px;
+    height: 40px;
+    margin-top: 2px;
     margin-bottom: 4px;
+    }
+
+@media (min-width: 992px) {
+    .tl-post-divider {
+        height: 20px;
+        margin-top: 8px;
+        margin-bottom: 4px;
+        }
     }

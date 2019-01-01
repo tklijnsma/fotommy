@@ -22,10 +22,12 @@
 
 <!-- Photo header -->
 <div style="text-align: left">
-    <i style="color: #53585F">Taken on {{ photo.creation_date.strftime('%B %d, %Y at %H:%M') }}</i>
+    {% if photo.creation_date != None  %}
+    <i style="color: #53585F">Taken on {{ photo.creation_date.strftime('%B %d, %Y at %H:%M')  }}</i>
+    {% endif %}
     <div style="float: right; padding-bottom: 0.4em">
         <a
-            class="fotommy-postbutton"
+            class="fotommy-button fotommy-postbutton"
             href="{{ url_for('fullres', album_name=photo.album.name, photo_id=photo.id) }}"
             >
             <i class="fas fa-arrows-alt"></i> Full

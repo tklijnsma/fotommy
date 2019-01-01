@@ -7,11 +7,12 @@
 
 {% block head %}{% endblock %}
 
-<div class=page>
+<div class="page">
 
     <div class="bg-lightgrey fotommy-header">
         {% block backbutton %}{% endblock %}
         <h1 class="text-darkgrey" style="display:inline; vertical-align: middle">Fotommy</h1>
+        {% block aboutbutton %}{% endblock %}
     </div>
 
     {% for message in get_flashed_messages() %}

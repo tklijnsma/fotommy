@@ -1,9 +1,38 @@
-<section class="pb-photos-section">
+
+{% if photos|length <= 1 %}
+    {% set ncols = 1 %}
+{% elif photos|length == 2 %}
+    {% set ncols = 2 %}
+{% elif photos|length == 3 %}
+    {% set ncols = 3 %}
+{% elif photos|length == 4 %}
+    {% set ncols = 2 %}
+{% elif photos|length == 5 %}
+    {% set ncols = 3 %}
+{% else %}
+    {% set ncols = 3 %}
+{% endif %}
+
+<section
+    class="pb-photos-section"
+    style="
+        -moz-column-count:    {{ ncols }};
+        -webkit-column-count: {{ ncols }};
+        column-count:         {{ ncols }};
+        "
+    >
+
 {% for photo in photos[::-1] %}
+
 <div class="pb-photo-container">
+
     <a href="{{ url_for('photo', album_name=album_name, photo_id=photo.id) }}">
         <img
+            {% if photos|length == 1 %}
+            src="{{ url_for('static', filename=photo.imgrelpath_medium()) }}"
+            {% else %}
             src="{{ url_for('static', filename=photo.imgrelpath_thumbnail()) }}"
+            {% endif %}
             alt="not_loaded"
             >
         <div class="bottom-left text-white">
@@ -13,10 +42,13 @@
             <i class="fas fa-heart"></i>
             </div>
     </a>
+
 </div>
+
 {% else %}
     <p style="margin-top: 20px">
     <em>No photos</em>
     </p>
 {% endfor %}
+
 </section>

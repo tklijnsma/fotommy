@@ -2,3 +2,8 @@
 fotommy.egg-info
 *.pyc
 pw.txt
+
+._*
+*~
+
+fotommyenv

@@ -1,3 +1,20 @@
+
+.commsec-comment-container {
+    -moz-border-radius:18px;
+    -webkit-border-radius:18px;
+    margin:0.4em 0px;
+    padding-left: 0.3em;
+    }
+@media (min-width: 992px) {
+    .commsec-comment-container {
+        -moz-border-radius:10px;
+        -webkit-border-radius:10px;
+        margin:6px 0px;
+        padding-left: 6px;
+        }
+    }
+
+
 .commsec-commentform-authorfield, .commsec-commentform-messagefield {
     border: 2px solid #DDDEE0;
     border-radius: 4px;

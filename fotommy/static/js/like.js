@@ -5,6 +5,6 @@ function submitFunction(prefix) {
 
     var old_element = document.getElementById(prefix + "submit");
     var new_element = old_element.cloneNode(true);
-    new_element.setAttribute("class", "fotommy-greybutton")
+    new_element.setAttribute("class", "fotommy-button fotommy-greybutton")
     old_element.parentNode.replaceChild(new_element, old_element);
     }
