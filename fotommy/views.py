@@ -54,6 +54,7 @@ def timeline():
 def about():
     return render_template('about.html')
 
+
 @app.route('/createpost', methods=['GET', 'POST'])
 def createpost():
 
@@ -117,7 +118,7 @@ def createpost():
 
 @app.route('/')
 def index():
-    return redirect(url_for('albums'))
+    return redirect(url_for('timeline'))
 
 @app.route('/albums')
 def albums():
