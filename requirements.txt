@@ -1,0 +1,14 @@
+click==6.7
+Flask==0.12.2
+Flask-Dropzone==1.5.3
+Flask-SQLAlchemy==2.3.2
+Flask-Uploads==0.2.1
+Flask-WTF==0.14.2
+-e git+git@github.com:tklijnsma/fotommy.git@85fcad2ca4f87988122262b8b27273940e60a693#egg=fotommy
+itsdangerous==0.24
+Jinja2==2.10
+MarkupSafe==1.0
+Pillow==5.0.0
+SQLAlchemy==1.2.7
+Werkzeug==0.14.1
+WTForms==2.1
