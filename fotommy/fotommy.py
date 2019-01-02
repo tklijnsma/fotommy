@@ -59,6 +59,16 @@ def show_albums():
     print dbmanager.all_albums()
 
 @app.cli.command()
+def show_comments():
+    for comment in dbmanager.all_comments():
+        print comment
+
+@app.cli.command()
+@click.argument('comment_id')
+def del_comment(comment_id):
+    dbmanager.delete_comment(comment_id)
+
+@app.cli.command()
 @click.argument('album_name')
 def show_album(album_name):
     album = dbmanager.album_by_name(album_name)

@@ -96,5 +96,5 @@ class Comment(db.Model):
 
     def __repr__(self):
         short_text = self.text[:10] + '...' if len(self.text) > 13 else self.text
-        return '<Comment by %r: %r>' % self.author, self.short_text
+        return '< #{0} Comment by \'{1}\': \'{2}\'>'.format(self.id, self.author, short_text)
 

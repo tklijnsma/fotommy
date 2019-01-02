@@ -16,7 +16,10 @@ class DBManager(object):
         return db.session.query(Album).all()
 
     def all_photos(self):
-        return db.session.query(fotommy.moPhoto).all()
+        return db.session.query(Photo).all()
+
+    def all_comments(self):
+        return db.session.query(Comment).all()
 
     def album_by_name(self, name, fail_if_not_existing=False):
         albums = db.session.query(Album).filter_by(name=name).all()
@@ -45,6 +48,10 @@ class DBManager(object):
     def new_posts(self):
         six_months_ago = datetime.now() - timedelta(6.* 365./12.)
         return db.session.query(Post).filter(Post.date >= six_months_ago).all()[::-1]
+
+    def delete_comment(self, i):
+        db.session.query(Comment).filter(Comment.id==i).delete()
+        db.session.commit()
 
 
 class Factory(object):
