@@ -15,6 +15,9 @@ from werkzeug.utils import secure_filename
 
 @app.route('/robots.txt')
 @app.route('/sitemap.xml')
+def static_from_root():
+    return send_from_directory(app.static_folder, request.path[1:])
+
 @app.route('/android-chrome-192x192.png')
 @app.route('/android-chrome-384x384.png')
 @app.route('/apple-touch-icon.png')
@@ -25,8 +28,11 @@ from werkzeug.utils import secure_filename
 @app.route('/mstile-150x150.png')
 @app.route('/safari-pinned-tab.svg')
 @app.route('/site.webmanifest')
-def static_from_root():
-    return send_from_directory(app.static_folder, request.path[1:])
+def icon_root_urls():
+    return send_from_directory(
+        os.path.join(app.static_folder, 'icons'),
+        request.path[1:]
+        )
 
 @app.route('/timeline', methods=['GET', 'POST'])
 def timeline():
