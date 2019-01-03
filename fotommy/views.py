@@ -15,6 +15,16 @@ from werkzeug.utils import secure_filename
 
 @app.route('/robots.txt')
 @app.route('/sitemap.xml')
+@app.route('/android-chrome-192x192.png')
+@app.route('/android-chrome-384x384.png')
+@app.route('/apple-touch-icon.png')
+@app.route('/browserconfig.xml')
+@app.route('/favicon-16x16.png')
+@app.route('/favicon-32x32.png')
+@app.route('/favicon.ico')
+@app.route('/mstile-150x150.png')
+@app.route('/safari-pinned-tab.svg')
+@app.route('/site.webmanifest')
 def static_from_root():
     return send_from_directory(app.static_folder, request.path[1:])
 
