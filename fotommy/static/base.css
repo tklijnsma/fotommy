@@ -8,11 +8,15 @@
 .bg-verylightgrey { background-color: #ecedef; }
 .bg-lightgrey { background-color: #DDDEE0; }
 .bg-darkgrey { background-color: #53585F; }
+.bg-lightpink { background-color: #ffe8fd; }
+.bg-darkpink { background-color: #7f487a; }
 
 .no-b { border: none; }
 
 .text-white { color: white; }
 .text-darkgrey { color: #53585F; }
+.text-lightpink { color: #ffe8fd; }
+.text-darkpink { color: #7f487a; }
 
 .bottom-left {
     position: absolute;
