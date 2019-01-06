@@ -1,4 +1,5 @@
-# all the imports
+# -*- coding: utf-8 -*-
+
 import os, glob
 import sqlite3
 from flask import (
@@ -10,6 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 import click
 import logging
 logging.getLogger().setLevel(logging.INFO)
+logging._defaultFormatter = logging.Formatter(u"%(message)s")
 
 app = Flask(__name__) # create the application instance :)
 app.config.from_object(__name__) # load config from this file , flaskr.py

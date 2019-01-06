@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import fotommy
 import sys, os, logging
 from fotommy import db, app
@@ -213,7 +215,7 @@ class PostFactory(Factory):
 
     def create(self, text, photos=None):
         logging.info('Creating new Post')
-        logging.info('<text = {0}, photos = {1}>'.format(text, photos))
+        logging.info('<text = {0}, photos = {1}>'.format(text.encode('utf-8', 'replace'), photos))
         post = Post(text=text, photos=photos, date=datetime.now())
         logging.info(post)
         db.session.add(post)

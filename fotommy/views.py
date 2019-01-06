@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import logging, uuid, os
 from fotommy import db, dbmanager, app
 
@@ -53,8 +55,8 @@ def timeline():
                     return '', 304
             elif (post.commentform.author.data or post.commentform.text.data) and post.commentform.validate_on_submit():
                 logging.info('Comment is submitted for Post {0}'.format(post))
-                logging.info('post.commentform.author.data = {0}'.format(post.commentform.author.data))
-                logging.info('post.commentform.text.data = {0}'.format(post.commentform.text.data))
+                logging.info('post.commentform.author.data = {0}'.format(post.commentform.author.data.encode('utf-8', 'replace')))
+                logging.info('post.commentform.text.data = {0}'.format(post.commentform.text.data.encode('utf-8', 'replace')))
                 comment = models.Comment(
                     author = post.commentform.author.data,
                     text   = post.commentform.text.data,
@@ -80,7 +82,7 @@ def createpost():
 
         if postform.submit.data and postform.validate_on_submit():
             logging.info('CreatePostForm is submitted:')
-            logging.info('postform.text.data = {0}'.format(postform.text.data))
+            logging.info('postform.text.data = {0}'.format(postform.text.data.encode('utf-8', 'replace')))
             logging.info('postform.secretpassword.data = {0}'.format(postform.secretpassword.data))
 
             if not os.path.exists('fotommy/pw.txt'):
@@ -123,7 +125,7 @@ def createpost():
             flash('An error occured')
 
             logging.info('CreatePostForm is submitted:')
-            logging.info('postform.text.data = {0}'.format(postform.text.data))
+            logging.info('postform.text.data = {0}'.format(postform.text.data.encode('utf-8', 'replace')))
             logging.info('postform.photos = {0}'.format(postform.photos))
             print request.files
             for f in request.files:
@@ -162,8 +164,8 @@ def photo(album_name, photo_id):
             return '', 204
         elif (commentform.author.data or commentform.text.data) and commentform.validate_on_submit():
             logging.info('Comment is submitted for Photo {0}'.format(photo))
-            logging.info('commentform.author.data = {0}'.format(commentform.author.data))
-            logging.info('commentform.text.data = {0}'.format(commentform.text.data))
+            logging.info('commentform.author.data = {0}'.format(commentform.author.data.encode('utf-8', 'replace')))
+            logging.info('commentform.text.data = {0}'.format(commentform.text.data.encode('utf-8', 'replace')))
             comment = models.Comment(
                 author = commentform.author.data,
                 text   = commentform.text.data,
