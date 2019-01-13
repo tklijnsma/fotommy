@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import logging, uuid, os
-from fotommy import db, dbmanager, app
+import logging, uuid, os, functools
+from fotommy import db, dbmanager, app, login_manager
 
 from flask import (
     Flask, request, session, g, redirect, url_for, abort,
@@ -9,10 +9,40 @@ from flask import (
     send_from_directory
     )
 
-from forms import CommentForm, IncreaseLikeForm, CreatePostForm
+from forms import *
 import factories, models
 
 from werkzeug.utils import secure_filename
+import werkzeug.security
+
+import flask_login
+from flask_login import current_user
+
+def login_required(groups=['public']):
+    """Custom login_required wrapper to deal with groups"""
+    def wrapper(fn):
+        @functools.wraps(fn)
+        def decorated_view(*args, **kwargs):
+            if 'public' in groups:
+                logging.info('Allowing access, public')
+            if not(current_user.is_authenticated):
+                return login_manager.unauthorized()
+            user_groups = [g.name for g in current_user.groups]
+            if current_user.is_admin():
+                logging.info('Allowing access, user is admin')
+            else:
+                intersection = list(set(user_groups) & set(groups))
+                if len(intersection) > 0:
+                    logging.info('Allowing access through group(s) {0}'.format(intersection))
+                else:
+                    logging.info(
+                        'Unauthorized; no intersection between user {0} and required {1}'
+                        .format(current_user.groups, groups)
+                        )
+                    return login_manager.unauthorized()                
+            return fn(*args, **kwargs)
+        return decorated_view
+    return wrapper
 
 
 @app.route('/robots.txt')
@@ -36,9 +66,56 @@ def icon_root_urls():
         request.path[1:]
         )
 
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm(prefix='register')
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            logging.info('Registration submitted for email {0}'.format(form.email.data))
+            pwhash = werkzeug.security.generate_password_hash(form.password.data)
+            user = models.User(email=form.email.data, pwhash=pwhash)
+            db.session.add(user)
+            db.session.commit()
+            return redirect(url_for('timeline'))
+    return render_template('register.html', registerform=form)
+
+def is_safe_url(url):
+    logging.info('Url {0} is safe'.format(url))
+    return True
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm(prefix='login')
+    if form.validate_on_submit():
+        logging.info('Login for email {0}'.format(form.email.data))
+        user = dbmanager.user_by_email(form.email.data)
+        if user is None:
+            flash('No user registered for {0}'.format(form.email.data))
+        else:
+            logging.info('Found user {0}'.format(user))
+            if user.check_password(form.password.data):
+                flask_login.login_user(user)
+                flash('Logged in successfully.')
+                next = request.args.get('next')
+                # is_safe_url should check if the url is safe for redirects.
+                # See http://flask.pocoo.org/snippets/62/ for an example.
+                if not is_safe_url(next):
+                    return abort(400)
+                return redirect(next or url_for('index'))
+            else:
+                flash('Password incorrect')
+
+    return render_template('login.html', loginform=form)
+
+
 @app.route('/timeline', methods=['GET', 'POST'])
 def timeline():
-    posts=dbmanager.new_posts()
+    if current_user.is_authenticated:
+        posts = dbmanager.new_posts_for_user(current_user)
+    else:
+        posts = dbmanager.new_posts_public()
+    
     for i, post in enumerate(posts):
         post.commentform = CommentForm(prefix='comment{0}'.format(i))
         post.likeform = IncreaseLikeForm(prefix='like{0}'.format(i))
@@ -57,11 +134,15 @@ def timeline():
                 logging.info('Comment is submitted for Post {0}'.format(post))
                 logging.info('post.commentform.author.data = {0}'.format(post.commentform.author.data.encode('utf-8', 'replace')))
                 logging.info('post.commentform.text.data = {0}'.format(post.commentform.text.data.encode('utf-8', 'replace')))
+                logging.info('post.commentform.visibility.data = {0}'.format(post.commentform.visibility.data.encode('utf-8', 'replace')))
                 comment = models.Comment(
                     author = post.commentform.author.data,
                     text   = post.commentform.text.data,
                     post   = post
                     )
+                comment.groups.append(dbmanager.group_by_name(post.commentform.visibility.data))
+                if current_user.is_authenticated:
+                    comment.user = current_user
                 db.session.add(comment)
                 db.session.commit()
                 return redirect(url_for('timeline'))
@@ -74,56 +155,51 @@ def about():
 
 
 @app.route('/createpost', methods=['GET', 'POST'])
+@login_required(groups=['admin'])
 def createpost():
-
     postform = CreatePostForm(prefix='postform')
+    groups = dbmanager.all_groups()
 
     if request.method == 'POST':
 
         if postform.submit.data and postform.validate_on_submit():
             logging.info('CreatePostForm is submitted:')
             logging.info('postform.text.data = {0}'.format(postform.text.data.encode('utf-8', 'replace')))
-            logging.info('postform.secretpassword.data = {0}'.format(postform.secretpassword.data))
 
-            if not os.path.exists('fotommy/pw.txt'):
-                logging.error('No file pw.txt found')
-                flash('Error processing password')
-            with open('fotommy/pw.txt', 'r') as fp:
-                pw = fp.read().strip()
-            if postform.secretpassword.data != pw:
-                logging.error('{0} != {1} (actual pw)'.format(postform.secretpassword.data, pw))
-                flash('Password is incorrect!')
-            else:                
-                photos = request.files.getlist('postform-photos')
-                photo_instances = []
+            formvals = request.form.to_dict()
+            selected_groups = []
+            for group in groups:
+                if group.name in formvals.keys() and formvals[group.name] == u'on':
+                    selected_groups.append(group)
+            logging.info('Selected groups: {0}'.format(selected_groups))
 
-                if photos:
-                    uploadalbum = dbmanager.album_by_name('uploads', fail_if_not_existing=False)
-                    if uploadalbum is None:
-                        uploadalbum = factories.AlbumFactory().create('uploads')
-                    photofactory = factories.PhotoFactory(uploadalbum)
+            photos = request.files.getlist('postform-photos')
+            photo_instances = []
 
-                    for fs in photos:
-                        logging.info('Processing {0}'.format(fs))
-                        image_file = os.path.join(
-                            app.config['UPLOADED_PHOTOS_DEST'],
-                            str(uuid.uuid4()) + secure_filename(fs.filename)
-                            )
-                        fs.save(image_file)
-                        logging.info('Saved to {0}'.format(image_file))
+            if photos:
+                uploadalbum = dbmanager.album_by_name('uploads')
+                photofactory = factories.PhotoFactory(uploadalbum)
 
-                        logging.info('Entering {0} into database'.format(image_file))
-                        photo_instance = photofactory.create(image_file)
-                        photo_instances.append(photo_instance)
-                else:
-                    logging.info('No photos attached')
+                for fs in photos:
+                    logging.info('Processing {0}'.format(fs))
+                    image_file = os.path.join(
+                        app.config['UPLOADED_PHOTOS_DEST'],
+                        str(uuid.uuid4()) + secure_filename(fs.filename)
+                        )
+                    fs.save(image_file)
+                    logging.info('Saved to {0}'.format(image_file))
 
-                factories.PostFactory().create(postform.text.data, photo_instances)
-                return redirect(url_for('timeline'))
+                    logging.info('Entering {0} into database'.format(image_file))
+                    photo_instance = photofactory.create(image_file)
+                    photo_instances.append(photo_instance)
+            else:
+                logging.info('No photos attached')
+
+            factories.PostFactory().create(postform.text.data, photo_instances, groups=selected_groups)
+            return redirect(url_for('timeline'))
 
         else:
             flash('An error occured')
-
             logging.info('CreatePostForm is submitted:')
             logging.info('postform.text.data = {0}'.format(postform.text.data.encode('utf-8', 'replace')))
             logging.info('postform.photos = {0}'.format(postform.photos))
@@ -131,7 +207,7 @@ def createpost():
             for f in request.files:
                 print request.files.get(f)
 
-    return render_template('createpost.html', postform=postform)
+    return render_template('createpost.html', postform=postform, groups=groups)
 
 
 @app.route('/')

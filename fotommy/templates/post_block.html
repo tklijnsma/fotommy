@@ -16,7 +16,13 @@
 
 <br>
 
-{% with comments=post.comments, form=post.commentform %}
+{% if current_user.is_authenticated %}
+    {% set comments = post.comments_for_user(current_user) %}
+{% else %}
+    {% set comments = post.public_comments() %}
+{% endif %}
+
+{% with comments=comments, form=post.commentform %}
 {% include 'commentsection.html' %}
 {% endwith %}
 

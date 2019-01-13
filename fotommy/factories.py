@@ -8,11 +8,16 @@ from PIL import Image, ExifTags
 import uuid
 from datetime import datetime, timedelta
 
+from werkzeug.security import generate_password_hash
+
 class DBManager(object):
     """docstring for DBManager"""
     def __init__(self, db):
         super(DBManager, self).__init__()
         self.db = db
+
+    def all_users(self):
+        return db.session.query(User).all()
         
     def all_albums(self):
         return db.session.query(Album).all()
@@ -22,6 +27,9 @@ class DBManager(object):
 
     def all_comments(self):
         return db.session.query(Comment).all()
+
+    def all_groups(self):
+        return db.session.query(Group).all()
 
     def album_by_name(self, name, fail_if_not_existing=False):
         albums = db.session.query(Album).filter_by(name=name).all()
@@ -33,6 +41,30 @@ class DBManager(object):
             logging.info('Found multiple albums for name \'{0}\' (taking first): {1}'.format(name, albums))
         album = albums[0]
         return album
+
+    def user_by_email(self, email):
+        users = db.session.query(User).filter_by(email=email).all()
+        if len(users) == 0:
+            logging.info('No user found with email {0}'.format(email))
+            return None
+        else:
+            return users[0]
+
+    def user_by_id(self, id):
+        users = db.session.query(User).filter_by(id=id).all()
+        if len(users) == 0:
+            logging.info('No user found with id {0}'.format(id))
+            return None
+        else:
+            return users[0]
+
+    def group_by_name(self, name):
+        groups = db.session.query(Group).filter_by(name=name).all()
+        if len(groups) == 0:
+            logging.info('No group found with name {0}'.format(name))
+            return None
+        else:
+            return groups[0]
 
     def photo_by_id(self, id):
         photos = db.session.query(Photo).filter_by(id=id).all()
@@ -51,6 +83,12 @@ class DBManager(object):
         six_months_ago = datetime.now() - timedelta(6.* 365./12.)
         return db.session.query(Post).filter(Post.date >= six_months_ago).all()[::-1]
 
+    def new_posts_for_user(self, user):
+        return [ p for p in self.new_posts() if p.allow(user) ]
+
+    def new_posts_public(self):
+        return [ p for p in self.new_posts() if p.is_public() ]
+
     def delete_comment(self, i):
         db.session.query(Comment).filter(Comment.id==i).delete()
         db.session.commit()
@@ -62,6 +100,15 @@ class Factory(object):
         super(Factory, self).__init__()
         self.dbmanager = DBManager(db)
 
+
+class UserFactory(Factory):
+    """ """
+    def __init__(self, album):
+        super(UserFactory, self).__init__()
+
+    def create(self, email, password):
+        pwhash = generate_password_hash(password)
+        user = User(email=email, pwhash=pwhash)
 
 
 class PhotoFactory(Factory):
@@ -213,10 +260,11 @@ class PostFactory(Factory):
     def __init__(self):
         super(PostFactory, self).__init__()
 
-    def create(self, text, photos=None):
+    def create(self, text, photos=None, groups=None):
         logging.info('Creating new Post')
         logging.info('<text = {0}, photos = {1}>'.format(text.encode('utf-8', 'replace'), photos))
         post = Post(text=text, photos=photos, date=datetime.now())
+        if not(groups is None): post.groups.extend(groups)
         logging.info(post)
         db.session.add(post)
         db.session.commit()

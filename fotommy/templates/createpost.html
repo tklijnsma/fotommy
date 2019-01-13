@@ -18,14 +18,6 @@ Type your message and upload your photos here
 
     {{ postform.hidden_tag() }}
 
-    {% for message in postform.secretpassword.errors %}
-    <div class="error">{{ message }}</div>
-    {% endfor %}
-
-    <p>
-        {{ postform.secretpassword(size=32, placeholder="Secret upload password", class_="cp-textfield") }}
-        </p>
-
     {% for message in postform.text.errors %}
     <div class="error">{{ message }}</div>
     {% endfor %}
@@ -33,6 +25,20 @@ Type your message and upload your photos here
     <p>
         {{ postform.text(size=32, placeholder="Your message", class_="cp-textfield") }}
         </p>
+
+    {% for group in groups %}
+    {% if group.name == 'public' %}
+        {% set checked='' %}
+    {% else %}
+        {% set checked='checked' %}
+    {% endif %}
+    <div>
+    <input type="checkbox" id="{{group.name}}" name="{{group.name}}" {{checked}}>
+    <label for="{{group.name}}">{{group.name}}</label>
+    </div>
+    {% endfor %}
+
+    <div style="height: 0.5em"></div>
 
     {% for message in postform.photos.errors %}
     <div class="error">{{ message }}</div>
@@ -42,7 +48,7 @@ Type your message and upload your photos here
 
 
     <p style="margin-top: 1.0em;">
-        {{ postform.submit(class_="fotommy-postbutton") }}
+        {{ postform.submit(class_="fotommy-button fotommy-postbutton") }}
         </p>
 
 </form>

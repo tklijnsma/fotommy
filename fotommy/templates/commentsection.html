@@ -1,6 +1,16 @@
 {% for comment in comments %}
     <div class="bg-verylightgrey commsec-comment-container">
-    <b style="color: #385a97">{{ comment.author }}</b> {{ comment.text }}
+    <b style="color: #385a97">{{ comment.author }}</b><span
+        style="font-size: 0.3em"
+        class="text-darkgrey"
+        >
+    {% if comment.is_public() %}
+        [public]
+    {% else %}
+        [private]
+    {% endif %}
+    </span>
+    {{ comment.text }}
     </div>
 {% endfor %}
 
@@ -8,6 +18,12 @@
 
 <form method="post">
     {{ form.hidden_tag() }}
+
+    {% for message in form.visibility.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    {{ form.visibility }}
 
     {% for message in form.author.errors %}
     <div class="error">{{ message }}</div>

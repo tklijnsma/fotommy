@@ -14,7 +14,6 @@
         }
     }
 
-
 .commsec-commentform-authorfield, .commsec-commentform-messagefield {
     border: 2px solid #DDDEE0;
     border-radius: 4px;
@@ -30,4 +29,20 @@
     padding: 4px 25px;
     margin: 4px 2px;
     font-size: 1.5em;
+    }
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    }
+
+li {
+    float: left;
+    list-style-type: none;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    margin-right: 1em;
     }

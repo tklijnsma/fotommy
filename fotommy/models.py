@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import os
-from fotommy import db, app
+from fotommy import db, app, login_manager
+from flask_login import UserMixin
+import werkzeug.security
+
 
 posts = db.Table(
     'posts',
@@ -9,7 +12,77 @@ posts = db.Table(
     db.Column('photo_id', db.Integer, db.ForeignKey('photo.id'), primary_key=True)
     )
 
-class Post(db.Model):
+
+groups_to_users = db.Table(
+    'groups_to_users',
+    db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    )
+
+groups_to_posts = db.Table(
+    'groups_to_posts',
+    db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True),
+    db.Column('post_id', db.Integer, db.ForeignKey('post.id'), primary_key=True),
+    )
+
+groups_to_photos = db.Table(
+    'groups_to_photos',
+    db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True),
+    db.Column('photo_id', db.Integer, db.ForeignKey('photo.id'), primary_key=True),
+    )
+
+groups_to_comments = db.Table(
+    'groups_to_comments',
+    db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True),
+    db.Column('comment_id', db.Integer, db.ForeignKey('comment.id'), primary_key=True),
+    )
+
+
+class Group(db.Model):
+    __table_args__ = {'extend_existing': True} 
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+
+    def __repr__(self):
+        return '<Group #{0} {1} >'.format(self.id, self.name)
+
+
+class AuthMixin(object):
+    """docstring for AuthMixin"""
+
+    def is_public(self):
+        return 'public' in [ g.name for g in self.groups  ]
+
+    def allow(self, user):
+        if self.is_public():
+            return True
+        elif hasattr(self, 'user') and self.user is user:
+            return True
+        else:
+            return len(set(user.groups) & set(self.groups)) > 0
+
+
+class User(db.Model, UserMixin):
+    __table_args__ = {'extend_existing': True} 
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), nullable=False, unique=True)
+    pwhash = db.Column(db.String(1000), nullable=False)
+    comments = db.relationship('Comment')
+    groups = db.relationship('Group', secondary=groups_to_users)
+
+    def check_password(self, password):
+        return werkzeug.security.check_password_hash(self.pwhash, password)
+
+    def is_admin(self):
+        return 'admin' in [ g.name for g in self.groups ]
+
+    def __repr__(self):
+        return '<User #{0:<3} {1} {2}>'.format(self.id, self.email, self.groups)
+
+
+class Post(db.Model, AuthMixin):
     __table_args__ = {'extend_existing': True} 
 
     id = db.Column(db.Integer, primary_key=True)
@@ -19,9 +92,19 @@ class Post(db.Model):
     n_likes = db.Column(db.Integer, nullable=False, default=0)
     comments = db.relationship('Comment')
     photos = db.relationship('Photo', secondary=posts)
+    groups = db.relationship('Group', secondary=groups_to_posts)
+
+    def public_comments(self):
+        return [ c for c in self.comments if c.is_public() ]
+
+    def comments_for_user(self, user):
+        return [ c for c in self.comments if c.allow(user) ]
+
+    def __repr__(self):
+        return '<Post #{0:<3} {1}>'.format(self.id, self.groups)
 
 
-class Photo(db.Model):
+class Photo(db.Model, AuthMixin):
     __table_args__ = {'extend_existing': True} 
 
     id = db.Column(db.Integer, primary_key=True)
@@ -37,6 +120,7 @@ class Photo(db.Model):
 
     comments = db.relationship('Comment')
     posts = db.relationship('Post', secondary=posts)
+    groups = db.relationship('Group', secondary=groups_to_photos)
 
     n_likes = db.Column(db.Integer, nullable=False, default=0)
     creation_date = db.Column(db.DateTime(), nullable=True)
@@ -83,12 +167,15 @@ class Album(db.Model):
         return '{0} {1}'.format(n_photos, photo_str)
 
 
-class Comment(db.Model):
+class Comment(db.Model, AuthMixin):
     __table_args__ = {'extend_existing': True} 
 
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String(50), nullable=False)
     text = db.Column(db.String(400), nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship("User", back_populates="comments")
 
     photo_id = db.Column(db.Integer, db.ForeignKey('photo.id'))
     photo = db.relationship("Photo", back_populates="comments") # not totally necessary
@@ -96,7 +183,26 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     post = db.relationship("Post", back_populates="comments") # not totally necessary
 
+    groups = db.relationship('Group', secondary=groups_to_comments)
+
     def __repr__(self):
         short_text = self.text[:10] + '...' if len(self.text) > 13 else self.text
-        return '< #{0} Comment by \'{1}\': \'{2}\'>'.format(self.id, self.author, short_text)
+        return (
+            '< #{0} Comment by \'{1}\'{4}: \'{2}\'; {3}>'
+            .format(
+                self.id, self.author, short_text, self.groups,
+                ' (' + self.user.email + ')' if not(self.user is None) else ''
+                )
+            )
+
+    # def is_public(self):
+    #     return 'public' in [ g.name for g in self.groups  ]
+
+    # def allow(self, user):
+    #     if self.is_public():
+    #         return True
+    #     elif self.user is user:
+    #         return True
+    #     else:
+    #         return len(set(user.groups) & set(self.groups)) > 0
 
