@@ -25,22 +25,25 @@
 
     {{ form.visibility }}
 
-    {% for message in form.author.errors %}
-    <div class="error">{{ message }}</div>
-    {% endfor %}
-    <p>
-        {{ form.author(size=32, class_="commsec-commentform-authorfield", placeholder="Your name") }}
-        </p>
+    {% if not current_user.is_authenticated %}
+        {% for message in form.author.errors %}
+        <div class="error">{{ message }}</div>
+        {% endfor %}
+        <div style="margin-top: 0.2em">
+            {{ form.author(size=32, class_="commsec-commentform-authorfield", placeholder="Your name") }}
+            </div>
+    {% endif %}
 
     {% for message in form.text.errors %}
     <div class="error">{{ message }}</div>
     {% endfor %}
-    <p style="margin-top: -0.7em;">
-        {{ form.text(size=32, class_="commsec-commentform-messagefield", placeholder="Your message") }}
-        </p>
 
-    <p style="margin-top: -1.0em;">
-        <button type="submit" class="fotommy-button fotommy-postbutton">
+    <div style="margin-top: 0.2em">
+        {{ form.text(size=32, class_="commsec-commentform-messagefield", placeholder="Your message") }}
+        </div>
+
+    <p >
+        <button type="submit" class="fotommy-button fotommy-bluebutton">
             <i class="far fa-comment"></i> Submit
             </button>
         </p>

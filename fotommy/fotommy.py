@@ -73,6 +73,9 @@ def init_db():
     public_group = models.Group(name='public')
     db.session.add(public_group)
 
+    admin_group = models.Group(name='loggedin')
+    db.session.add(admin_group)
+
     admin_group = models.Group(name='admin')
     db.session.add(admin_group)
 
@@ -83,6 +86,7 @@ def init_db():
         pw = fp.read().strip()
 
     admin_user  = models.User(
+        name = 'Thomas',
         email = 'thomasklijnsma@gmail.com',
         pwhash = werkzeug.security.generate_password_hash(pw)
         )
@@ -90,6 +94,7 @@ def init_db():
     db.session.add(admin_user)
 
     kennis_user  = models.User(
+        name = 'ThomasTest',
         email = 'tklijnsm@gmail.com',
         pwhash = werkzeug.security.generate_password_hash(pw)
         )

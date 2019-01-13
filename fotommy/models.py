@@ -67,8 +67,10 @@ class User(db.Model, UserMixin):
     __table_args__ = {'extend_existing': True} 
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     pwhash = db.Column(db.String(1000), nullable=False)
+    want_newsletter = db.Column(db.Boolean(), nullable=False, default=True)
     comments = db.relationship('Comment')
     groups = db.relationship('Group', secondary=groups_to_users)
 

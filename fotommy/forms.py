@@ -13,10 +13,15 @@ from flask import Markup
 
 
 class RegisterForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Register')
+    want_newsletter = BooleanField('Newsletter')
+    submit = SubmitField('Create account')
+
+class AccountEditForm(FlaskForm):
+    newpassword = PasswordField('New password', validators=[DataRequired()])
+    submit = SubmitField('Change password')
 
 class LoginForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])

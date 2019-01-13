@@ -2,8 +2,7 @@
 
 {% block body %}
 
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='register.css') }}">
-
+<p>Use your email and password to login.</p>
 
 <div>
 <form method="post">
@@ -17,7 +16,7 @@
         {{ loginform.email(
             size=64,
             placeholder="name@domain.nl",
-            class_="register-emailfield")
+            class_="input-w100")
             }}
         </span>
 
@@ -28,16 +27,24 @@
     <span style="display: block; margin-top: 0.4em;">
         {{ loginform.password(
             size=64, placeholder="password",
-            class_="register-passwordfield")
+            class_="input-w100")
             }}
         </span>
 
     <span style="display: block; margin-top: 0.4em;">
-        {{ loginform.submit(class_="fotommy-button fotommy-backbutton") }}
+        {{ loginform.submit(class_="fotommy-button fotommy-greenbutton") }}
         </span>
 
 </form>
 </div>
+
+<p style="margin-top: 0.6em">No account yet?
+Click here to create a new account:
+<a
+    href="{{ url_for('register') }}" class="fotommy-button fotommy-orangebutton" >
+    <i class="fas fa-user-circle"></i> Create account
+    </a>
+</p>
 
 {% endblock %}
 

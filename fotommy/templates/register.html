@@ -4,37 +4,52 @@
 
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='register.css') }}">
 
+Fill in your information to create an account, and get access to much more of our photos.
 
 <div>
 <form method="post">
     {{ registerform.hidden_tag() }}
+
+    {% for message in registerform.name.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    <span style="display: block; margin-top: 0.4em;">
+        <b>Name:</b>
+        {{ registerform.name(
+            size=64,
+            placeholder="Name",
+            class_="input-w100")
+            }}
+        </span>
 
     {% for message in registerform.email.errors %}
     <div class="error">{{ message }}</div>
     {% endfor %}
 
     <span style="display: block; margin-top: 0.4em;">
+        <b>Email:</b>
         {{ registerform.email(
             size=64,
             placeholder="name@domain.nl",
-            class_="register-emailfield")
+            class_="input-w100")
             }}
         </span>
-
 
     {% for message in registerform.password.errors %}
     <div class="error">{{ message }}</div>
     {% endfor %}
 
     <span style="display: block; margin-top: 0.4em;">
+        <b>Password:</b>
         {{ registerform.password(
             size=64, placeholder="password",
-            class_="register-passwordfield")
+            class_="input-w100")
             }}
         </span>
 
     <span style="display: block; margin-top: 0.4em;">
-        {{ registerform.submit(class_="fotommy-button fotommy-backbutton") }}
+        {{ registerform.submit(class_="fotommy-button fotommy-orangebutton") }}
         </span>
 
 </form>

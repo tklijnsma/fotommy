@@ -21,8 +21,10 @@
 
     <div class="bg-lightpink fotommy-header">
         {% block backbutton %}{% endblock %}
-        <h1 class="text-darkpink" style="display:inline; vertical-align: middle">Amélie</h1>
-        {% block aboutbutton %}{% endblock %}
+        <a href="{{ url_for('timeline') }}" style="text-decoration: none">
+            <h1 class="text-darkpink" style="display:inline; vertical-align: middle">Amélie</h1></a>
+        {% block loginblock %}{% endblock %}
+        <!-- {% block aboutbutton %}{% endblock %} -->
     </div>
 
     {% for message in get_flashed_messages() %}
