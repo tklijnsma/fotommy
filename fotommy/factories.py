@@ -139,7 +139,7 @@ class PhotoFactory(Factory):
         super(PhotoFactory, self).__init__()
         self.album = album
 
-    def create(self, imgpath_full):
+    def create(self, imgpath_full, groups=None):
         logging.info('Adding photo {0} to album {1}'.format(imgpath_full, self.album.name))
 
         imgpath_medium = self.make_medium_photo(imgpath_full)
@@ -154,6 +154,8 @@ class PhotoFactory(Factory):
         creation_date = self.get_creation_date(imgpath_full)
         if not(creation_date is None):
             photo.creation_date = creation_date
+
+        if not(groups is None): photo.groups.extend(groups)
 
         if not self.debug:
             logging.info('Adding {0} to the db'.format(photo))

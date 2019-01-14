@@ -273,7 +273,7 @@ def createpost():
                     logging.info('Saved to {0}'.format(image_file))
 
                     logging.info('Entering {0} into database'.format(image_file))
-                    photo_instance = photofactory.create(image_file)
+                    photo_instance = photofactory.create(image_file, groups=selected_groups)
                     photo_instances.append(photo_instance)
             else:
                 logging.info('No photos attached')
@@ -298,10 +298,12 @@ def index():
     return redirect(url_for('timeline'))
 
 @app.route('/albums')
+@login_required(groups=['admin'])
 def albums():
     return render_template('albums.html', albums=dbmanager.all_albums())
 
 @app.route('/album/<album_name>')
+@login_required(groups=['admin'])
 def album(album_name):
     album = dbmanager.album_by_name(album_name)
     if album is None: abort(404)
@@ -311,6 +313,8 @@ def album(album_name):
 def photo(album_name, photo_id):
     photo = dbmanager.photo_by_id(photo_id)
     if photo is None: abort(404)
+    if not photo.allow(current_user):
+        return login_manager.unauthorized()
 
     commentform = CommentForm(prefix='comment')
     likeform = IncreaseLikeForm(prefix='like')
@@ -354,6 +358,8 @@ def photo(album_name, photo_id):
 def fullres(album_name, photo_id):
     photo = dbmanager.photo_by_id(photo_id)
     if photo is None: abort(404)
+    if not photo.allow(current_user):
+        return login_manager.unauthorized()
 
     photo_dir, photo_filename = photo.imgpath_full.rsplit('/', 1)
 
