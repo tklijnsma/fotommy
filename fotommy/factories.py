@@ -81,6 +81,16 @@ class DBManager(object):
         photo = photos[0]
         return photo
 
+    def post_by_id(self, id):
+        posts = db.session.query(Post).filter_by(id=id).all()
+        if len(posts) == 0:
+            logging.info('No post found with id {0}'.format(id))
+            return None
+        elif len(posts) > 1:
+            logging.info('Found multiple posts for id {0} (taking first): {1}'.format(name, posts))
+        post = posts[0]
+        return post
+
     def photo_increase_like(self, photo):
         photo.n_likes += 1
         db.session.commit()

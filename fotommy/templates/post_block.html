@@ -1,6 +1,16 @@
 <div class="po-post-container w100">
 
-<div class="po-date text-darkgrey">{{ post.date }}</div>
+<div class="po-date text-darkgrey">{{ post.date }}
+{% if is_admin %}
+<a
+    href="{{ url_for('editpost', post_id=post.id) }}"
+    class="fotommy-button fotommy-orangebutton"
+    style="font-size: 0.6em"
+    >
+    Edit this post
+    </a>
+{% endif %}
+</div>
 
 <div style="white-space: pre-wrap;">{{ post.text }}</div>
 

@@ -47,3 +47,7 @@ class CreatePostForm(FlaskForm):
     text = TextAreaField('Text', validators=[DataRequired()])
     submit = SubmitField('Submit')
     photos = FileField('Photos')
+
+class EditPostForm(FlaskForm):
+    text = TextAreaField('Text', validators=[DataRequired()])
+    submit = SubmitField('Edit')

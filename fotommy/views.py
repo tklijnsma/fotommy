@@ -33,8 +33,8 @@ def notify_new_comment(author, pub_or_priv, comment):
     body = [
         'New comment created at {0}'.format(timestamp()),
         'id: {0}'.format(comment.id),
-        'author: {0}'.format(comment.author),
-        'text: {0}'.format(comment.text),
+        'author: {0}'.format(comment.author.encode('utf-8', 'replace')),
+        'text: {0}'.format(comment.text.encode('utf-8', 'replace')),
         'user: {0}'.format(comment.user),
         'photo: {0}'.format(comment.photo),
         'post: {0}'.format(comment.post),
@@ -73,6 +73,12 @@ def login_required(groups=['loggedin']):
         return decorated_view
     return wrapper
 
+def current_user_is_admin():
+    if hasattr(current_user, 'groups'):
+        logging.info('current_user.groups = {0}'.format(current_user.groups))
+        if 'admin' in [ g.name for g in current_user.groups ]:
+            return True
+    return False
 
 @app.route('/robots.txt')
 @app.route('/sitemap.xml')
@@ -112,7 +118,7 @@ def register():
             body = [
                 'New account created at {0}'.format(timestamp()),
                 'id: {0}'.format(user.id),
-                'name: {0}'.format(user.name),
+                'name: {0}'.format(user.name.encode('utf-8', 'replace')),
                 'email: {0}'.format(user.email),
                 'want_newsletter: {0}'.format(user.want_newsletter),
                 'comments: {0}'.format(user.comments),
@@ -236,7 +242,8 @@ def timeline():
                 else:
                     flash('Your comment is submitted!')
                 return redirect(url_for('timeline'))
-    return render_template('timeline.html', posts=posts)
+    logging.info('is_admin: {0}'.format(current_user_is_admin()))
+    return render_template('timeline.html', posts=posts, is_admin=current_user_is_admin())
 
 
 
@@ -300,6 +307,32 @@ def createpost():
 
     return render_template('createpost.html', postform=postform, groups=groups)
 
+
+@app.route('/editpost/<post_id>', methods=['GET', 'POST'])
+@login_required(groups=['admin'])
+def editpost(post_id):
+    post = dbmanager.post_by_id(post_id)
+    if post is None: abort(404)
+    groups = dbmanager.all_groups()
+
+    form = EditPostForm(prefix='editform')
+
+    if request.method == 'POST':
+        if form.submit.data and form.validate_on_submit():
+            formvals = request.form.to_dict()
+            selected_groups = []
+            for group in groups:
+                if group.name in formvals.keys() and formvals[group.name] == u'on':
+                    selected_groups.append(group)
+            logging.info('Selected groups: {0}'.format(selected_groups))
+            post.groups = selected_groups
+            post.text = form.text.data
+            db.session.commit()
+            flash('Post {0} edited!'.format(post_id))
+            return redirect(url_for('timeline'))
+
+    form.text.data = post.text
+    return render_template('editpost.html', post=post, form=form, groups=groups)
 
 @app.route('/')
 def index():
