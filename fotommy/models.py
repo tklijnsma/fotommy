@@ -64,6 +64,8 @@ class AuthMixin(object):
             return True
         elif hasattr(self, 'user') and self.user is user:
             return True
+        elif not hasattr(user, 'groups'):
+            return False
         else:
             return len(set(user.groups) & set(self.groups)) > 0
 

@@ -74,7 +74,8 @@ class DBManager(object):
     def photo_by_id(self, id):
         photos = db.session.query(Photo).filter_by(id=id).all()
         if len(photos) == 0:
-            logging.info('No photo found with id {0}'.format(name))
+            logging.info('No photo found with id {0}'.format(id))
+            return None
         elif len(photos) > 1:
             logging.info('Found multiple photos for id {0} (taking first): {1}'.format(name, photos))
         photo = photos[0]

@@ -227,6 +227,14 @@ def timeline():
                     post.commentform.visibility.data,
                     comment
                     )
+                if not current_user.is_authenticated and post.commentform.visibility.data == 'admin':
+                    flash(
+                        'Your comment is submitted, '
+                        'but you set it to \'private\' and are not logged in, '
+                        'so you will not be able to see it'
+                        )
+                else:
+                    flash('Your comment is submitted!')
                 return redirect(url_for('timeline'))
     return render_template('timeline.html', posts=posts)
 
