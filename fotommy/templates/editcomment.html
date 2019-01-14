@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='createpost.css') }}">
+
+
+Edit the message and authentication requirements
+
+<br><br>
+
+<form method="post">
+
+    {{ form.hidden_tag() }}
+
+    {% for message in form.visibility.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    {{ form.visibility }}
+
+    {% for message in form.text.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    <div style="margin-top: 0.2em">
+        {{ form.text(size=32, class_="input-w100", placeholder="Your message") }}
+        </div>
+
+    {{ form.submit(class_="fotommy-button fotommy-bluebutton") }}
+
+</form>
+
+{% endblock %}
+
