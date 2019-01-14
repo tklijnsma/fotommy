@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='createpost.css') }}">
+
+
+Edit the message and authentication requirements
+
+<br><br>
+
+<form method="post" enctype="multipart/form-data">
+
+    {{ form.hidden_tag() }}
+
+    {% for group in groups %}
+    {% if group in post.groups %}
+        {% set checked='checked' %}
+    {% else %}
+        {% set checked='' %}
+    {% endif %}
+    <div>
+    <input type="checkbox" id="{{group.name}}" name="{{group.name}}" {{checked}}>
+    <label for="{{group.name}}">{{group.name}}</label>
+    </div>
+    {% endfor %}
+
+    {% for message in form.text.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    <div style="height: 0.5em"></div>
+
+    <p>
+        {{ form.text(rows="12", placeholder="Your message", class_="cp-textfield") }}
+        </p>
+
+    <p style="margin-top: 1.0em;">
+        {{ form.submit(class_="fotommy-button fotommy-bluebutton") }}
+        </p>
+
+</form>
+
+{% endblock %}
+
