@@ -139,6 +139,8 @@ class Photo(db.Model, AuthMixin):
     def __repr__(self):
         return 'Photo %r' % self.imgpath_full
 
+    def comments_for_user(self, user):
+        return [ c for c in self.comments if c.allow(user) ]
 
     def imgrelpath_thumbnail(self):
         return os.path.relpath(self.imgpath_thumbnail, os.path.join(app.root_path, 'static'))

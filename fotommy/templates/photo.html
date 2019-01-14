@@ -49,7 +49,7 @@
 
 <br>
 
-{% with comments=photo.comments, form=form %}
+{% with comments=photo.comments_for_user(current_user), form=form %}
 {% include 'commentsection.html' %}
 {% endwith %}
 
