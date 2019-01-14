@@ -29,7 +29,12 @@ class DBManager(object):
         return db.session.query(Comment).all()
 
     def all_groups(self):
-        return db.session.query(Group).all()
+        # Put admin group as last group
+        groups = db.session.query(Group).all()
+        admin_group = [g for g in groups if g.name == 'admin'][0]
+        groups.remove(admin_group)
+        groups.append(admin_group)
+        return groups
 
     def album_by_name(self, name, fail_if_not_existing=False):
         albums = db.session.query(Album).filter_by(name=name).all()

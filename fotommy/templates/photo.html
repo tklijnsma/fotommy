@@ -70,5 +70,9 @@ document.getElementById("{{likeform._prefix}}submit").addEventListener(
     "click",
     function(){submitFunction("{{likeform._prefix}}")}
     );
+document.getElementById("{{form._prefix}}submit").addEventListener(
+    "click",
+    function(){disableCommentSubmit("{{form._prefix}}")}
+    );
 {% endblock %}
 

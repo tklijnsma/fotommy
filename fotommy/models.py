@@ -45,7 +45,7 @@ class Group(db.Model):
     name = db.Column(db.String(100), nullable=False, unique=True)
 
     def __repr__(self):
-        return '<Group #{0} {1} >'.format(self.id, self.name)
+        return 'Group #{0} {1}'.format(self.id, self.name)
 
 
 class AuthMixin(object):
@@ -54,8 +54,13 @@ class AuthMixin(object):
     def is_public(self):
         return 'public' in [ g.name for g in self.groups  ]
 
+    def is_public_after_auth(self):
+        return 'loggedin' in [ g.name for g in self.groups  ]
+
     def allow(self, user):
         if self.is_public():
+            return True
+        elif self.is_public_after_auth() and user.is_authenticated:
             return True
         elif hasattr(self, 'user') and self.user is user:
             return True
@@ -81,7 +86,8 @@ class User(db.Model, UserMixin):
         return 'admin' in [ g.name for g in self.groups ]
 
     def __repr__(self):
-        return '<User #{0:<3} {1} {2}>'.format(self.id, self.email, self.groups)
+        return 'User #{0:<3} {1} {2}'.format(self.id, self.email, self.groups)
+
 
 
 class Post(db.Model, AuthMixin):
@@ -103,7 +109,8 @@ class Post(db.Model, AuthMixin):
         return [ c for c in self.comments if c.allow(user) ]
 
     def __repr__(self):
-        return '<Post #{0:<3} {1}>'.format(self.id, self.groups)
+        return 'Post #{0:<3} {1}'.format(self.id, self.groups)
+
 
 
 class Photo(db.Model, AuthMixin):
@@ -128,7 +135,8 @@ class Photo(db.Model, AuthMixin):
     creation_date = db.Column(db.DateTime(), nullable=True)
 
     def __repr__(self):
-        return '<Photo %r>' % self.imgpath_full
+        return 'Photo %r' % self.imgpath_full
+
 
     def imgrelpath_thumbnail(self):
         return os.path.relpath(self.imgpath_thumbnail, os.path.join(app.root_path, 'static'))
@@ -147,7 +155,7 @@ class Album(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False)
 
     def __repr__(self):
-        return '<Album %r>' % self.name
+        return 'Album %r' % self.name
 
     def repr_elaborate(self):
         r = self.__repr__()
@@ -190,21 +198,11 @@ class Comment(db.Model, AuthMixin):
     def __repr__(self):
         short_text = self.text[:10] + '...' if len(self.text) > 13 else self.text
         return (
-            '< #{0} Comment by \'{1}\'{4}: \'{2}\'; {3}>'
+            'Comment #{0} by \'{1}\'{4}: \'{2}\'; {3}'
             .format(
                 self.id, self.author, short_text, self.groups,
                 ' (' + self.user.email + ')' if not(self.user is None) else ''
                 )
             )
 
-    # def is_public(self):
-    #     return 'public' in [ g.name for g in self.groups  ]
-
-    # def allow(self, user):
-    #     if self.is_public():
-    #         return True
-    #     elif self.user is user:
-    #         return True
-    #     else:
-    #         return len(set(user.groups) & set(self.groups)) > 0
 

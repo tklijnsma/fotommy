@@ -16,7 +16,7 @@
 
 <div style="font-size:1.2em; padding-top: 0.8em; padding-bottom: 0.1em; color: #385a97;"><i>Leave a comment!</i></div>
 
-<form method="post">
+<form method="post" id="{{form._prefix}}form">
     {{ form.hidden_tag() }}
 
     {% for message in form.visibility.errors %}
@@ -43,7 +43,7 @@
         </div>
 
     <p >
-        <button type="submit" class="fotommy-button fotommy-bluebutton">
+        <button id="{{form._prefix}}submit" type="submit" class="fotommy-button fotommy-bluebutton">
             <i class="far fa-comment"></i> Submit
             </button>
         </p>

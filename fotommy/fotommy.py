@@ -18,16 +18,18 @@ logging._defaultFormatter = logging.Formatter(u"%(message)s")
 app = Flask(__name__) # create the application instance
 app.config.from_object(__name__) # load config from this file
 
-from flask_wtf.csrf import CsrfProtect
-CsrfProtect(app)
-
+# Account utility
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+from flask_wtf.csrf import CsrfProtect
+CsrfProtect(app)
 
 # Load default config and override config from an environment variable
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'fotommy.db'),
-    SECRET_KEY='development key',
+    SECRET_KEY='secereto',
+    WTF_CSRF_SECRET_KEY="csrf secereto",
     SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.root_path, 'fotommy.db'),
     SQLALCHEMY_TRACK_MODIFICATIONS = False,
     PHOTOPATH=os.path.join(app.root_path, 'static/photos'),
@@ -44,6 +46,7 @@ if not os.path.isdir(app.config['UPLOADED_PHOTOS_DEST']):
 import models, factories
 dbmanager = factories.DBManager(db)
 
+# Must be after importing the models
 @login_manager.user_loader
 def load_user(user_id):
     # return User.get(user_id)
@@ -52,7 +55,6 @@ def load_user(user_id):
         return None
     else:
         return users[0]
-
 
 # Dropzone settings
 from flask_dropzone import Dropzone
@@ -64,23 +66,24 @@ app.config['DROPZONE_UPLOAD_ON_CLICK'] = True
 app.config['DROPZONE_REDIRECT_VIEW'] = 'createpost' # This redirects immediately after uploading... not the wanted interaction
 
 
-
 @app.cli.command()
 def init_db():
     db.create_all()
     db.session.commit()
 
+    # Default groups
     public_group = models.Group(name='public')
     db.session.add(public_group)
-
-    admin_group = models.Group(name='loggedin')
-    db.session.add(admin_group)
-
+    loggedin_group = models.Group(name='loggedin')
+    db.session.add(loggedin_group)
     admin_group = models.Group(name='admin')
     db.session.add(admin_group)
 
+    # Useful groups
     kennis_group = models.Group(name='kennis')
     db.session.add(kennis_group)
+    familie_group = models.Group(name='familie')
+    db.session.add(familie_group)
 
     with open(os.path.join(app.root_path, 'pw.txt'), 'r') as fp:
         pw = fp.read().strip()
@@ -93,13 +96,28 @@ def init_db():
     admin_user.groups.append(admin_group)
     db.session.add(admin_user)
 
+    loggedin_user  = models.User(
+        name = 'test-loggedin',
+        email = 'thomasklijnsma+loggedin@gmail.com',
+        pwhash = werkzeug.security.generate_password_hash(pw)
+        )
+    db.session.add(loggedin_user)
+
     kennis_user  = models.User(
-        name = 'ThomasTest',
-        email = 'tklijnsm@gmail.com',
+        name = 'test-kennis',
+        email = 'thomasklijnsma+kennis@gmail.com',
         pwhash = werkzeug.security.generate_password_hash(pw)
         )
     kennis_user.groups.append(kennis_group)
     db.session.add(kennis_user)
+
+    familie_user  = models.User(
+        name = 'test-familie',
+        email = 'thomasklijnsma+familie@gmail.com',
+        pwhash = werkzeug.security.generate_password_hash(pw)
+        )
+    familie_user.groups.append(familie_group)
+    db.session.add(familie_user)
 
     album = models.Album(name='uploads')
     db.session.add(album)
@@ -186,15 +204,4 @@ def _util_add_photo_to_album(album_name, imgpath_full):
     factory = factories.PhotoFactory(album)
     factory.create(imgpath_full)
 
-
 import views
-
-
-
-
-
-
-
-
-
-

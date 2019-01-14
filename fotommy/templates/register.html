@@ -7,7 +7,7 @@
 Fill in your information to create an account, and get access to much more of our photos.
 
 <div>
-<form method="post">
+<form method="post" id="registerform">
     {{ registerform.hidden_tag() }}
 
     {% for message in registerform.name.errors %}
@@ -49,7 +49,7 @@ Fill in your information to create an account, and get access to much more of ou
         </span>
 
     <span style="display: block; margin-top: 0.4em;">
-        {{ registerform.submit(class_="fotommy-button fotommy-orangebutton") }}
+        {{ registerform.submit(class_="fotommy-button fotommy-orangebutton", id="registersubmit") }}
         </span>
 
 </form>
@@ -57,3 +57,14 @@ Fill in your information to create an account, and get access to much more of ou
 
 {% endblock %}
 
+
+{% block script %}
+document.getElementById("registersubmit").addEventListener(
+    "click",
+    function(){
+        document.getElementById("registersubmit").disabled = true;
+        document.getElementById("registersubmit").setAttribute("class", "fotommy-button fotommy-greybutton");
+        document.getElementById("registerform").submit();
+        }
+    );
+{% endblock %}

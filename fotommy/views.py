@@ -18,6 +18,35 @@ import werkzeug.security
 import flask_login
 from flask_login import current_user, logout_user
 
+from customemail import Email
+
+import time
+def timestamp():
+    return time.strftime('%Y-%m-%d %H:%M:%S')
+
+def escape_html(text):
+    return text.replace('"','').replace("'",'').replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;')
+
+def notify_new_comment(author, pub_or_priv, comment):
+    if pub_or_priv == 'admin': pub_or_priv = 'private'
+    subject = 'New {0} comment by {1}'.format(pub_or_priv, author)
+    body = [
+        'New comment created at {0}'.format(timestamp()),
+        'id: {0}'.format(comment.id),
+        'author: {0}'.format(comment.author),
+        'text: {0}'.format(comment.text),
+        'user: {0}'.format(comment.user),
+        'photo: {0}'.format(comment.photo),
+        'post: {0}'.format(comment.post),
+        'groups: {0}'.format(comment.groups),
+        'IP: {0}'.format(request.remote_addr),
+        ]
+    email = Email(
+        subject = subject,
+        body    = '<br>\n'.join(body)
+        )
+    email.send()
+
 def login_required(groups=['loggedin']):
     """Custom login_required wrapper to deal with groups"""
     def wrapper(fn):
@@ -80,6 +109,21 @@ def register():
             flask_login.login_user(user)
             logging.info('Registered {0}'.format(user))
             flash('Account successfully created!')
+            body = [
+                'New account created at {0}'.format(timestamp()),
+                'id: {0}'.format(user.id),
+                'name: {0}'.format(user.name),
+                'email: {0}'.format(user.email),
+                'want_newsletter: {0}'.format(user.want_newsletter),
+                'comments: {0}'.format(user.comments),
+                'groups: {0}'.format(user.groups),
+                'IP: {0}'.format(request.remote_addr),
+                ]
+            email = Email(
+                subject = 'New account: {0}'.format(user),
+                body    = '<br>\n'.join(body)
+                )
+            email.send()
             return redirect(url_for('timeline'))
     return render_template('register.html', registerform=form)
 
@@ -178,6 +222,11 @@ def timeline():
                     comment.user = current_user
                 db.session.add(comment)
                 db.session.commit()
+                notify_new_comment(
+                    post.commentform.author.data,
+                    post.commentform.visibility.data,
+                    comment
+                    )
                 return redirect(url_for('timeline'))
     return render_template('timeline.html', posts=posts)
 
@@ -292,6 +341,11 @@ def photo(album_name, photo_id):
                 comment.user = current_user
             db.session.add(comment)
             db.session.commit()
+            notify_new_comment(
+                commentform.author.data,
+                commentform.visibility.data,
+                comment
+                )
             return redirect(url_for('photo', album_name=album_name, photo_id=photo_id))
 
     return render_template('photo.html', photo=photo, form=commentform, likeform=likeform)

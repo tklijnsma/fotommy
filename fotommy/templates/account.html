@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='register.css') }}">
+
+<h2>Account settings</h2>
+
+<p>
+<b>Name:</b> {{ current_user.name }}
+<br>
+<b>Email:</b> {{ current_user.email }}
+</p>
+
+<h2>Change your password</h2>
+
+<div>
+<form method="post">
+    {{ pwform.hidden_tag() }}
+
+    {% for message in pwform.newpassword.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    <span style="display: block; margin-top: 0.4em;">
+        {{ pwform.newpassword(
+            size=64, placeholder="new password",
+            class_="input-w100")
+            }}
+        </span>
+
+    <span style="display: block; margin-top: 0.4em;">
+        {{ pwform.submit(class_="fotommy-button fotommy-orangebutton") }}
+        </span>
+
+</form>
+</div>
+
+{% endblock %}
+

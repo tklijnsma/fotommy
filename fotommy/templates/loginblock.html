@@ -1,0 +1,15 @@
+{% if current_user.is_authenticated %}
+<span class="fr" style="font-size: 0.5em">
+    <span class="loginfontsize"><b>
+        <a style="text-decoration: none; color: black" href="{{ url_for('account') }}">
+        <i class="fas fa-user-circle"></i>&nbsp{{current_user.name}}&nbsp
+        </b></span></a><br><a class="fotommy-button fotommy-greenbutton loginfontsize" href="{{ url_for('logout') }}" style="margin-left: 0.0em">logout</a>
+    </span>
+{% else %}
+<div class="fr">
+    <a href="{{ url_for('login') }}" class="fotommy-button fotommy-greenbutton" >
+        <i class="fas fa-user-circle"></i> Login
+    </a>
+    </div>
+    &nbsp
+{% endif %}
