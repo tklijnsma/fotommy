@@ -2,6 +2,7 @@
 
 import os
 from fotommy import db, app, login_manager
+import flask_login
 from flask_login import UserMixin
 import werkzeug.security
 
@@ -70,6 +71,10 @@ class AuthMixin(object):
             return len(set(user.groups) & set(self.groups)) > 0
 
 
+def anonymous_is_admin():
+    return False
+flask_login.mixins.AnonymousUserMixin.is_admin = staticmethod(anonymous_is_admin)
+
 class User(db.Model, UserMixin):
     __table_args__ = {'extend_existing': True} 
 
@@ -85,7 +90,10 @@ class User(db.Model, UserMixin):
         return werkzeug.security.check_password_hash(self.pwhash, password)
 
     def is_admin(self):
-        return 'admin' in [ g.name for g in self.groups ]
+        if len(self.groups) > 0:
+            return 'admin' in [ g.name for g in self.groups ]
+        else:
+            return False
 
     def __repr__(self):
         return 'User #{0:<3} {1} {2}'.format(self.id, self.email, self.groups)

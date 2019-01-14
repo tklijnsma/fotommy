@@ -1,14 +1,18 @@
 {% for comment in comments %}
     <div class="bg-verylightgrey commsec-comment-container">
-    <b style="color: #385a97">{{ comment.author }}</b><span
+    <b style="color: #385a97">{{ comment.author }}
+    {% if current_user.is_admin() or comment.user == current_user %}
+    <a style="text-decoration: none" href="{{ url_for('editcomment', comment_id=comment.id) }}"><i class="far fa-edit"></i></a>
+    {% endif %}
+    </b><span
         style="font-size: 0.3em"
         class="text-darkgrey"
         >
-    {% if comment.is_public() %}
-        [public]
-    {% else %}
-        [private]
-    {% endif %}
+        {% if comment.is_public() %}
+            [public]
+        {% else %}
+            [private]
+        {% endif %}
     </span>
     <span style="white-space: pre-wrap;">{{ comment.text }}</span>
     </div>
@@ -30,7 +34,7 @@
         <div class="error">{{ message }}</div>
         {% endfor %}
         <div style="margin-top: 0.2em">
-            {{ form.author(size=32, class_="commsec-commentform-authorfield", placeholder="Your name") }}
+            {{ form.author(size=32, class_="input-w100", placeholder="Your name") }}
             </div>
     {% endif %}
 
@@ -39,7 +43,7 @@
     {% endfor %}
 
     <div style="margin-top: 0.2em">
-        {{ form.text(size=32, class_="commsec-commentform-messagefield", placeholder="Your message") }}
+        {{ form.text(size=32, class_="input-w100", placeholder="Your message") }}
         </div>
 
     <p >

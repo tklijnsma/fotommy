@@ -308,6 +308,37 @@ def createpost():
     return render_template('createpost.html', postform=postform, groups=groups)
 
 
+@app.route('/editcomment/<comment_id>', methods=['GET', 'POST'])
+def editcomment(comment_id):
+    comment = dbmanager.comment_by_id(comment_id)
+    if comment is None: abort(404)
+    if not(current_user_is_admin() or comment.user == current_user):
+        return login_manager.unauthorized()
+    groups = dbmanager.all_groups()
+
+    form = EditCommentForm(prefix='editform')
+
+    if request.method == 'POST':
+        if form.submit.data and form.validate_on_submit():
+            formvals = request.form.to_dict()
+            selected_groups = []
+            print formvals.keys()
+            for group in groups:
+                if group.name in formvals.keys() and formvals[group.name] == u'on':
+                    selected_groups.append(group)
+            logging.info('Selected groups: {0}'.format(selected_groups))
+            comment.groups = [dbmanager.group_by_name(form.visibility.data)]
+            comment.text = form.text.data
+            db.session.commit()
+            flash('Comment {0} edited!'.format(comment_id))
+            return redirect(url_for('timeline'))
+        else:
+            flash('Submission problem')
+
+    form.text.data = comment.text
+    return render_template('editcomment.html', comment=comment, form=form)
+
+
 @app.route('/editpost/<post_id>', methods=['GET', 'POST'])
 @login_required(groups=['admin'])
 def editpost(post_id):

@@ -51,3 +51,16 @@ class CreatePostForm(FlaskForm):
 class EditPostForm(FlaskForm):
     text = TextAreaField('Text', validators=[DataRequired()])
     submit = SubmitField('Edit')
+
+class EditCommentForm(FlaskForm):
+    text = TextAreaField('Text', validators=[DataRequired()])
+    submit = SubmitField('Edit')
+    visibility = RadioField('Label',
+        choices = [
+            ('admin', u'<b>Private:</b> For you and Amélie'),
+            ('public', u'<b>Public:</b> For everybody')
+            ],
+        default = 'admin'
+        )
+
+

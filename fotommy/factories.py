@@ -77,7 +77,7 @@ class DBManager(object):
             logging.info('No photo found with id {0}'.format(id))
             return None
         elif len(photos) > 1:
-            logging.info('Found multiple photos for id {0} (taking first): {1}'.format(name, photos))
+            logging.info('Found multiple photos for id {0} (taking first): {1}'.format(id, photos))
         photo = photos[0]
         return photo
 
@@ -87,9 +87,19 @@ class DBManager(object):
             logging.info('No post found with id {0}'.format(id))
             return None
         elif len(posts) > 1:
-            logging.info('Found multiple posts for id {0} (taking first): {1}'.format(name, posts))
+            logging.info('Found multiple posts for id {0} (taking first): {1}'.format(id, posts))
         post = posts[0]
         return post
+
+    def comment_by_id(self, id):
+        comments = db.session.query(Comment).filter_by(id=id).all()
+        if len(comments) == 0:
+            logging.info('No comment found with id {0}'.format(id))
+            return None
+        elif len(comments) > 1:
+            logging.info('Found multiple comments for id {0} (taking first): {1}'.format(id, comments))
+        comment = comments[0]
+        return comment
 
     def photo_increase_like(self, photo):
         photo.n_likes += 1
