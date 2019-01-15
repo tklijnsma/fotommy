@@ -3,5 +3,6 @@ if [[ $HOSTNAME =~ .*MacBook.* ]]; then
     flask run --port 5000
 else
     cd /home/pi/code/flask/fotommy
-    ./bkg flask run --host 0.0.0.0 --port 23457 --with-threads
+    # ./bkg flask run --host 0.0.0.0 --port 23457 --with-threads
+    ./bkg python run.py
 fi

@@ -80,6 +80,37 @@ def current_user_is_admin():
             return True
     return False
 
+@app.route('/var/www/<filename>')
+def varwww(filename):
+    return send_from_directory(
+        os.path.join(
+            app.static_folder,
+            'www'
+            ),
+        filename
+        )
+
+@app.route('/.well-known/<filename>')
+def wellknown(filename):
+    return send_from_directory(
+        os.path.join(
+            app.static_folder,
+            'www/.well-known'
+            ),
+        filename
+        )
+@app.route('/.well-known/<subdir>/<filename>')
+def wellknown_subdir(subdir, filename):
+    return send_from_directory(
+        os.path.join(
+            app.static_folder,
+            'www/.well-known',
+            subdir
+            ),
+        filename
+        )
+
+
 @app.route('/robots.txt')
 @app.route('/sitemap.xml')
 def static_from_root():
