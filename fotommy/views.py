@@ -350,7 +350,13 @@ def editcomment(comment_id):
     form = EditCommentForm(prefix='editform')
 
     if request.method == 'POST':
-        if form.submit.data and form.validate_on_submit():
+        if "editcomment-remove" in request.form:
+            logging.info('Deleting comment {0}'.format(comment))
+            db.session.delete(comment)
+            db.session.commit()
+            flash('Comment {0} deleted!'.format(comment_id))
+            return redirect(url_for('timeline'))
+        elif form.submit.data and form.validate_on_submit():
             formvals = request.form.to_dict()
             selected_groups = []
             print formvals.keys()
