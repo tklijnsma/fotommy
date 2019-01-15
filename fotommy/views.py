@@ -198,7 +198,7 @@ def login():
         else:
             logging.info('Found user {0}'.format(user))
             if user.check_password(form.password.data):
-                flask_login.login_user(user)
+                flask_login.login_user(user, remember=True)
                 flash('Logged in successfully.')
                 next = request.args.get('next')
                 # is_safe_url should check if the url is safe for redirects.
