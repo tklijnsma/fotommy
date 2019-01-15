@@ -380,7 +380,13 @@ def editpost(post_id):
     form = EditPostForm(prefix='editform')
 
     if request.method == 'POST':
-        if form.submit.data and form.validate_on_submit():
+        if "editform-remove" in request.form:
+            logging.info('Deleting post {0}'.format(post))
+            db.session.delete(post)
+            db.session.commit()
+            flash('Post {0} edited!'.format(post_id))
+            return redirect(url_for('timeline'))
+        elif form.submit.data and form.validate_on_submit():
             formvals = request.form.to_dict()
             selected_groups = []
             for group in groups:
@@ -392,6 +398,8 @@ def editpost(post_id):
             db.session.commit()
             flash('Post {0} edited!'.format(post_id))
             return redirect(url_for('timeline'))
+        else:
+            logging.info('Invalid post request')
 
     form.text.data = post.text
     return render_template('editpost.html', post=post, form=form, groups=groups)
