@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block loginblock %}
+{% include 'loginblock.html' %}
+{% endblock %}
+
+
+{% block body %}
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='register.css') }}">
+
+<h2>Account settings</h2>
+
+<p>
+<b>Name:</b> {{ user.name }}
+<br>
+<b>Email:</b> {{ user.email }}
+</p>
+
+<h2>Change permissions</h2>
+
+<div>
+<form id="permissionform" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    {% for group in groups %}
+    {% if group in user.groups %}
+        {% set checked='checked' %}
+    {% else %}
+        {% set checked='' %}
+    {% endif %}
+    <div>
+    <input type="checkbox" id="{{group.name}}" name="{{group.name}}" {{checked}}>
+    <label for="{{group.name}}">{{group.name}}</label>
+    </div>
+    {% endfor %}
+
+    <span style="display: block; margin-top: 0.4em;">
+        <input class="fotommy-button fotommy-orangebutton" id="submit-permissionform" name="submit-permissionform" type="submit" value="Change permissions">
+        </span>
+</form>
+</div>
+
+<div style="margin-top: 0.8em"></div>
+
+<h2>Change password</h2>
+
+<div>
+<form id="pwform" method="post">
+    {{ pwform.hidden_tag() }}
+
+    {% for message in pwform.newpassword.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    <span style="display: block; margin-top: 0.4em;">
+        {{ pwform.newpassword(
+            size=64, placeholder="new password",
+            class_="input-w100")
+            }}
+        </span>
+
+    <span style="display: block; margin-top: 0.4em;">
+        {{ pwform.submit(class_="fotommy-button fotommy-orangebutton") }}
+        </span>
+
+</form>
+</div>
+
+
+<div style="margin-top: 0.8em"></div>
+
+<h2>Change name and/or email</h2>
+
+<div>
+<form id="nameemailform" method="post">
+    {{ nameemailform.hidden_tag() }}
+
+    {% for message in nameemailform.name.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    <span style="display: block; margin-top: 0.4em;">
+        {{ nameemailform.name(class_="input-w100", placeholder="new name") }}
+        </span>
+
+    {% for message in nameemailform.email.errors %}
+    <div class="error">{{ message }}</div>
+    {% endfor %}
+
+    <span style="display: block; margin-top: 0.4em;">
+        {{ nameemailform.email(class_="input-w100", placeholder="name@domain.nl") }}
+        </span>
+
+    <span style="display: block; margin-top: 0.4em;">
+        {{ nameemailform.submit(class_="fotommy-button fotommy-orangebutton") }}
+        </span>
+
+</form>
+</div>
+
+
+<div>
+<form id="deletionform" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    <div style="margin-top: 1.0em;">
+        <button
+            type="submit"
+            name="submit-remove"
+            class="fr fotommy-button fotommy-redbutton"
+            onclick="return confirm('Are you sure you want to delete this user?');"
+            >
+            <i class="fas fa-exclamation-circle"></i> Remove</button>
+        </div>
+</form>
+</div>
+
+{% endblock %}
+
+
+

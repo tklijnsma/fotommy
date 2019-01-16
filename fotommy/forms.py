@@ -23,6 +23,11 @@ class AccountEditForm(FlaskForm):
     newpassword = PasswordField('New password', validators=[DataRequired()])
     submit = SubmitField('Change password')
 
+class AccountChangeNameEmailForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Change')
+
 class LoginForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])

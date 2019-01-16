@@ -5,6 +5,11 @@
 {{ dropzone.style('width: 96%; border:2px solid #385a97; margin: 0px 2%; min-height: 100px;') }}
 {% endblock %}
 
+{% block loginblock %}
+{% include 'loginblock.html' %}
+{% endblock %}
+
+
 {% block body %}
 
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='createpost.css') }}">

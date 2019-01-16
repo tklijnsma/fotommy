@@ -47,6 +47,15 @@ def notify_new_comment(author, pub_or_priv, comment):
         )
     email.send()
 
+def selected_groups_from_request(request, all_groups):
+    formvals = request.form.to_dict()
+    selected_groups = []
+    for group in all_groups:
+        if group.name in formvals.keys() and formvals[group.name] == u'on':
+            selected_groups.append(group)
+    logging.info('Selected groups: {0}'.format(selected_groups))
+    return selected_groups
+
 def login_required(groups=['loggedin']):
     """Custom login_required wrapper to deal with groups"""
     def wrapper(fn):
@@ -61,7 +70,7 @@ def login_required(groups=['loggedin']):
                 user_groups = [g.name for g in current_user.groups]
             else:
                 user_groups = []
-                
+
             if current_user.is_admin():
                 logging.info('Allowing access, user is admin')
             else:
@@ -169,6 +178,13 @@ def register():
             return redirect(url_for('timeline'))
     return render_template('register.html', registerform=form)
 
+def change_password(user, new_pw):
+    logging.info('Password change submitted for user {0}'.format(user))
+    pwhash = werkzeug.security.generate_password_hash(new_pw)
+    user.pwhash = pwhash
+    db.session.commit()
+    flash('Password successfully changed!')
+    logging.info('Password changed for user {0}'.format(user))
 
 @app.route('/account', methods=['GET', 'POST'])
 def account():
@@ -177,12 +193,7 @@ def account():
     form = AccountEditForm(prefix='account')
     if request.method == 'POST':
         if form.validate_on_submit():
-            logging.info('Account edit submitted for user {0}'.format(current_user))
-            pwhash = werkzeug.security.generate_password_hash(form.newpassword.data)
-            current_user.pwhash = pwhash
-            db.session.commit()
-            flash('Password successfully changed!')
-            logging.info('Password changed for user {0}'.format(current_user))
+            change_password(current_user, form.newpassword.data)
             return redirect(url_for('account'))
     return render_template('account.html', pwform=form)
 
@@ -415,11 +426,50 @@ def editpost(post_id):
     form.text.data = post.text
     return render_template('editpost.html', post=post, form=form, groups=groups)
 
+
 @app.route('/users')
 @login_required(groups=['admin'])
 def users():
     users = db.session.query(models.User).all()
     return render_template('users.html', users=users)
+
+@app.route('/user/<user_id>', methods=['GET', 'POST'])
+@login_required(groups=['admin'])
+def user(user_id):
+    users = db.session.query(models.User).filter_by(id=user_id).all()
+    if len(users) == 0: abort(404)
+    user = users[0]
+    groups = dbmanager.all_groups()
+
+    pwform = AccountEditForm(prefix='account')
+    nameemailform = AccountChangeNameEmailForm(prefix='nameemail')
+
+    if request.method == 'POST':
+        if 'submit-permissionform' in request.form:
+            selected_groups = selected_groups_from_request(request, groups)
+            user.groups = selected_groups
+            db.session.commit()
+            flash('Permissions updated')
+        elif pwform.validate_on_submit():
+            change_password(user, pwform.newpassword.data)
+        elif nameemailform.validate_on_submit():
+            user.name = nameemailform.name.data
+            user.email = nameemailform.email.data
+            db.session.commit()
+            flash('Name and email updated')
+        elif 'submit-remove' in request.form:
+            logging.info('Deleting user {0}'.format(user))
+            flash('Removed {0}'.format(user))
+            for comment in user.comments:
+                db.session.delete(comment)
+            db.session.delete(user)
+            db.session.commit()
+            return redirect(url_for('users'))
+        return redirect(url_for('user', user_id=user_id))
+
+    nameemailform.name.data = user.name
+    nameemailform.email.data = user.email
+    return render_template('user.html', user=user, pwform=pwform, nameemailform=nameemailform, groups=groups)
 
 
 @app.route('/')

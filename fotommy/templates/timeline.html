@@ -24,6 +24,19 @@
 
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='commentsection.css') }}">
 
+{% if current_user.is_admin() %}
+<div class="bg-lightpink" style="margin-top: 0.4em; margin-bottom: 0.6em; padding: 0.3em">
+    <a
+        href="{{ url_for('users') }}" class="fotommy-button fotommy-orangebutton" >
+        <i class="fas fa-user-circle"></i> Users
+        </a>
+    <a
+        href="{{ url_for('createpost') }}" class="fotommy-button fotommy-orangebutton" >
+        <i class="fas fa-images"></i> Create post
+        </a>
+    </div>
+{% endif %}
+
 
 {% for post in posts %}
     {% with post=post %}
