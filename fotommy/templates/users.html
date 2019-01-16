@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+{% for user in users %}
+    <div style="margin-bottom: 0.6em">
+        <div style="width:80%;">
+            <b>{{ user.name }}</b>
+            </div>
+            <div>
+                {{ user.email }}
+                </div>
+            <div style="margin-top: 0.15em;">
+                {% for group in user.groups %}
+                <span class="group-button">{{group.name}}</span>
+                {% else %}
+                <em>Not assigned to any group</em>
+                {% endfor %}
+                </div>
+    </div>
+{% else %}
+    <em>No users found.</em>
+{% endfor %}
+
+{% endblock %}
+
+
