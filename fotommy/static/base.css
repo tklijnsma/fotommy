@@ -193,6 +193,19 @@ p {
 
 /* CSS for buttons */
 
+.group-button {
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    background-color:#ffe1b7;
+    border:1px solid #eeb44f;
+    color: #FF8C00  ;
+    padding:2px 2px;
+    -moz-box-shadow:inset 0px 1px 0px 0px #fce2c1;
+    -webkit-box-shadow:inset 0px 1px 0px 0px #fce2c1;
+    box-shadow:inset 0px 1px 0px 0px #fce2c1;
+    }
+
 .fotommy-button {
     -moz-border-radius:6px;
     -webkit-border-radius:6px;

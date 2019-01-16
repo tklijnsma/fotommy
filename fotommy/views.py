@@ -410,6 +410,13 @@ def editpost(post_id):
     form.text.data = post.text
     return render_template('editpost.html', post=post, form=form, groups=groups)
 
+@app.route('/users')
+@login_required(groups=['admin'])
+def users():
+    users = db.session.query(models.User).all()
+    return render_template('users.html', users=users)
+
+
 @app.route('/')
 def index():
     return redirect(url_for('timeline'))
