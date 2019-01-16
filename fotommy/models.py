@@ -74,6 +74,7 @@ class AuthMixin(object):
 def anonymous_is_admin():
     return False
 flask_login.mixins.AnonymousUserMixin.is_admin = staticmethod(anonymous_is_admin)
+flask_login.mixins.AnonymousUserMixin.groups = []
 
 class User(db.Model, UserMixin):
     __table_args__ = {'extend_existing': True} 
