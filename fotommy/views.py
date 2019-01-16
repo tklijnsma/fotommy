@@ -56,7 +56,12 @@ def login_required(groups=['loggedin']):
                 logging.info('Allowing access, public')
             if 'loggedin' in groups and not(current_user.is_authenticated):
                 return login_manager.unauthorized()
-            user_groups = [g.name for g in current_user.groups]
+
+            if hasattr(current_user, 'groups'):
+                user_groups = [g.name for g in current_user.groups]
+            else:
+                user_groups = []
+                
             if current_user.is_admin():
                 logging.info('Allowing access, user is admin')
             else:
