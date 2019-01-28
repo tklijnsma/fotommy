@@ -152,7 +152,7 @@ def register():
     form = RegisterForm(prefix='register')
     if request.method == 'POST':
         if form.validate_on_submit():
-            logging.info('Registration submitted for name {1}, email {0}'.format(form.email.data, form.name.data))
+            logging.info('Registration submitted for name {1}, email {0}'.format(form.email.data, form.name.data.encode('utf-8', 'replace')))
             pwhash = werkzeug.security.generate_password_hash(form.password.data)
             user = models.User(name=form.name.data, email=form.email.data, pwhash=pwhash)
             db.session.add(user)
